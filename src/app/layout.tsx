@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ChatWidget } from "@/components/chat/ChatWidget";
+import { ChatLauncher } from "@/components/chat/ChatLauncher";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "Find answers to your health questions with our trusted, clinically reviewed knowledge base.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://project-sxpkl.vercel.app"
+    process.env.NEXT_PUBLIC_SITE_URL || "https://project-sxpkl.vercel.app"
   ),
   openGraph: {
     type: "website",
@@ -38,7 +38,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         {children}
-        <ChatWidget />
+        <ChatLauncher />
         <GoogleAnalyticsScript />
       </body>
     </html>

@@ -23,8 +23,7 @@ const SUGGESTIONS = [
 const DISCLAIMER =
   "For medical emergencies call 911. AI responses are informational only and do not constitute medical advice.";
 
-export function ChatWidget() {
-  const [open, setOpen] = useState(false);
+export function ChatWidget({ onClose }: { onClose: () => void }) {
   const [sessionReady, setSessionReady] = useState(false);
   const [sessionError, setSessionError] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -34,10 +33,9 @@ export function ChatWidget() {
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
 
-  // Issue an anonymous chat session cookie the first time the user opens
-  // the widget. Subsequent opens reuse the cookie via the browser.
+  // Issue an anonymous chat session cookie when the panel mounts.
   useEffect(() => {
-    if (!open || sessionReady) return;
+    if (sessionReady) return;
     let cancelled = false;
     fetch("/api/chat/session", { method: "POST" })
       .then((res) => {
@@ -53,7 +51,7 @@ export function ChatWidget() {
     return () => {
       cancelled = true;
     };
-  }, [open, sessionReady]);
+  }, [sessionReady]);
 
   // Keep the thread pinned to the latest message as tokens stream in.
   useEffect(() => {
@@ -92,27 +90,13 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* FAB */}
-      {!open && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Open Health Assistant chat"
-          className="fixed bottom-6 right-6 z-[60] flex h-[60px] w-[60px] items-center justify-center rounded-full bg-[#1c3829] text-white shadow-[0_8px_28px_rgba(28,56,41,.32)] transition-transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#1c3829]/30 sm:bottom-6 sm:right-6"
-        >
-          <ChatIcon />
-        </button>
-      )}
-
-      {/* Panel */}
-      {open && (
-        <div
-          role="dialog"
-          aria-label="Health Assistant chat"
-          className="fixed bottom-0 right-0 z-[60] flex w-full flex-col overflow-hidden bg-[#fdfbf8] shadow-[0_28px_72px_rgba(28,56,41,.22),0_8px_28px_rgba(28,56,41,.12)] sm:bottom-6 sm:right-6 sm:h-[556px] sm:w-[372px] sm:rounded-[22px]"
-          style={{ height: "100dvh", maxHeight: "100dvh" }}
-        >
-          <Header onNew={onNewConversation} onClose={() => setOpen(false)} canNew={messages.length > 0 && !isStreaming} />
+      <div
+        role="dialog"
+        aria-label="Health Assistant chat"
+        className="fixed bottom-0 right-0 z-[60] flex w-full flex-col overflow-hidden bg-[#fdfbf8] shadow-[0_28px_72px_rgba(28,56,41,.22),0_8px_28px_rgba(28,56,41,.12)] sm:bottom-6 sm:right-6 sm:h-[556px] sm:w-[372px] sm:rounded-[22px]"
+        style={{ height: "100dvh", maxHeight: "100dvh" }}
+      >
+        <Header onNew={onNewConversation} onClose={onClose} canNew={messages.length > 0 && !isStreaming} />
 
           <div
             ref={threadRef}
@@ -172,11 +156,10 @@ export function ChatWidget() {
             placeholder={messages.length === 0 ? "Ask a health question…" : "Ask a follow-up…"}
           />
 
-          <p className="bg-[#fdfbf8] px-4 pb-3 pt-1 text-[10.5px] leading-snug text-[#8a9a88]">
-            {DISCLAIMER}
-          </p>
-        </div>
-      )}
+        <p className="bg-[#fdfbf8] px-4 pb-3 pt-1 text-[10.5px] leading-snug text-[#8a9a88]">
+          {DISCLAIMER}
+        </p>
+      </div>
     </>
   );
 }
