@@ -54,8 +54,8 @@ export async function POST(req: NextRequest) {
       : 0;
 
   const algolia = algoliasearch(
-    process.env.ALGOLIA_APP_ID!,
-    process.env.ALGOLIA_ADMIN_API_KEY!
+    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+    process.env.ALGOLIA_ADMIN_KEY!
   );
 
   await algolia.saveObject({
