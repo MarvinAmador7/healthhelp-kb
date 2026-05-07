@@ -33,7 +33,7 @@ export default function HeroSearch() {
         <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-3">
           How can we help you?
         </h1>
-        <p className="text-lg text-white/80 mb-8">
+        <p className="text-lg text-white/95 mb-8">
           Trusted, clinically reviewed health information at your fingertips.
         </p>
 
@@ -65,7 +65,7 @@ export default function HeroSearch() {
 
         {/* Popular searches */}
         <div className="mt-5 flex flex-wrap justify-center gap-2" aria-label="Popular searches">
-          <span className="text-sm text-white/80 mr-1 self-center">Popular:</span>
+          <span className="text-sm text-white/95 mr-1 self-center">Popular:</span>
           {POPULAR_SEARCHES.map((term) => (
             <button
               key={term}
