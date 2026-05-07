@@ -9,8 +9,8 @@ export async function GET(req: NextRequest) {
   const page = parseInt(searchParams.get("page") ?? "0", 10);
 
   const client = algoliasearch(
-    process.env.ALGOLIA_APP_ID!,
-    process.env.ALGOLIA_ADMIN_API_KEY!
+    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+    process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY!
   );
 
   const filters: string[] = [];
