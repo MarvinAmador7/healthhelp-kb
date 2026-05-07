@@ -72,7 +72,7 @@ export default function HeroSearch() {
 
         {/* Popular searches */}
         <div className="mt-5 flex flex-wrap justify-center gap-2" aria-label="Popular searches">
-          <span className="text-sm text-white/60 mr-1 self-center">Popular:</span>
+          <span className="text-sm text-white/80 mr-1 self-center">Popular:</span>
           {POPULAR_SEARCHES.map((term) => (
             <button
               key={term}

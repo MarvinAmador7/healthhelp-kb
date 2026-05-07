@@ -12,21 +12,21 @@ export default function Footer() {
             </p>
           </div>
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-white/50 mb-3">Resources</p>
+            <p className="text-sm font-semibold uppercase tracking-wider text-white/80 mb-3">Resources</p>
             <ul className="space-y-2 text-sm text-white/80">
               <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
               <li><Link href="/search" className="hover:text-white transition-colors">Browse all topics</Link></li>
             </ul>
           </div>
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-white/50 mb-3">Support</p>
+            <p className="text-sm font-semibold uppercase tracking-wider text-white/80 mb-3">Support</p>
             <ul className="space-y-2 text-sm text-white/80">
               <li><a href="mailto:support@healthco.com" className="hover:text-white transition-colors">Email support</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Live chat</a></li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
+        <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/70">
           <p>© {new Date().getFullYear()} HealthCo. All rights reserved.</p>
           <p>
             No PHI is stored in this system. Content is for informational purposes only.
