@@ -12,6 +12,7 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Streamdown } from "streamdown";
 
 const SUGGESTIONS = [
   "What should I do for a sore throat?",
@@ -129,8 +130,32 @@ export function ChatWidget() {
             {!sessionError && !sessionReady && <SessionLoading />}
 
             {messages.map((m) => (
-              <MessageBubble key={m.id} role={m.role} parts={m.parts} streaming={status === "streaming" && m === messages[messages.length - 1] && m.role === "assistant"} />
+              <MessageBubble
+                key={m.id}
+                role={m.role}
+                parts={m.parts}
+                streaming={status === "streaming" && m === messages[messages.length - 1] && m.role === "assistant"}
+              />
             ))}
+
+            {/*
+              `submitted` = request sent, awaiting first token. The streaming
+              cursor inside the AI bubble only appears once a bubble exists,
+              so we need a separate "thinking" indicator for this gap or the
+              UI looks frozen between submit and first token.
+            */}
+            {status === "submitted" && (
+              <div className="flex items-start gap-2" aria-live="polite">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#e6f0e4] text-[11px] font-semibold text-[#2e5c42]">
+                  H
+                </div>
+                <div className="flex items-center gap-1.5 rounded-[10px] rounded-bl-[6px] border border-black/5 bg-white px-3.5 py-3">
+                  <ThinkingDot delay="0ms" />
+                  <ThinkingDot delay="160ms" />
+                  <ThinkingDot delay="320ms" />
+                </div>
+              </div>
+            )}
 
             {error && (
               <ErrorCard
@@ -284,7 +309,9 @@ function MessageBubble({
         H
       </div>
       <div className="max-w-[85%] rounded-[10px] rounded-bl-[6px] border border-black/5 bg-white px-3.5 py-3 text-[13.5px] leading-relaxed text-[#18201b]">
-        <span className="whitespace-pre-wrap">{text}</span>
+        <div className="streamdown-prose space-y-2">
+          <Streamdown>{text}</Streamdown>
+        </div>
         {streaming && (
           <span
             aria-hidden
@@ -293,6 +320,16 @@ function MessageBubble({
         )}
       </div>
     </div>
+  );
+}
+
+function ThinkingDot({ delay }: { delay: string }) {
+  return (
+    <span
+      aria-hidden
+      className="inline-block h-1.5 w-1.5 rounded-full bg-[#7fc88a] [animation:chat-thinking_1s_ease-in-out_infinite]"
+      style={{ animationDelay: delay }}
+    />
   );
 }
 
