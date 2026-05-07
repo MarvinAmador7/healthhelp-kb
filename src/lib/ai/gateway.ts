@@ -14,16 +14,9 @@ export const EMBEDDING_DIMENSIONS = 1536 as const;
 // Provider options consumed by streamText/generateText for the gateway
 // provider. The `order` array enables automatic provider fallback: if the
 // primary provider errors or times out, the gateway tries the next one.
-//
-// `hipaaCompliant: true` instructs the gateway to only route through providers
-// that satisfy HIPAA BAA constraints (required for patient-facing health
-// content under our compliance posture).
 export const gatewayProviderOptions = {
   gateway: {
     order: ["anthropic", "openai"],
-    hipaaCompliant: true,
-    disallowPromptTraining: true,
-    zeroDataRetention: true,
   },
 };
 
@@ -32,8 +25,5 @@ export const gatewayProviderOptions = {
 export const gatewayEmbeddingProviderOptions = {
   gateway: {
     order: ["openai"],
-    hipaaCompliant: true,
-    disallowPromptTraining: true,
-    zeroDataRetention: true,
   },
 };
