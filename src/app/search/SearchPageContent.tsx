@@ -3,9 +3,10 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { Search, SlidersHorizontal, ThumbsUp, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { SlidersHorizontal, ThumbsUp, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ZeroResults from "@/components/search/ZeroResults";
+import AutocompleteInput from "@/components/search/AutocompleteInput";
 
 interface Hit {
   objectID: string;
@@ -104,25 +105,18 @@ export default function SearchPageContent() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Search bar */}
       <form onSubmit={handleSearch} role="search" aria-label="Search articles" className="relative max-w-2xl mb-6">
-        <input
-          type="search"
+        <AutocompleteInput
           value={localQuery}
-          onChange={(e) => setLocalQuery(e.target.value)}
+          onChange={setLocalQuery}
           placeholder="Search articles…"
-          className={cn(
+          aria-label="Search query"
+          inputClassName={cn(
             "w-full h-[50px] pl-5 pr-14 rounded-full border border-[var(--color-border-strong)]",
             "bg-white text-base text-[var(--color-text-primary)]",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
           )}
-          aria-label="Search query"
+          buttonClassName="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-[var(--color-text-tertiary)] hover:text-[var(--color-primary)]"
         />
-        <button
-          type="submit"
-          aria-label="Submit search"
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-[var(--color-text-tertiary)] hover:text-[var(--color-primary)]"
-        >
-          <Search size={18} />
-        </button>
       </form>
 
       {/* Result count + breadcrumb */}

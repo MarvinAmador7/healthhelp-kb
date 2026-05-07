@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AutocompleteInput from "@/components/search/AutocompleteInput";
 
 const POPULAR_SEARCHES = [
   "medication dosage",
@@ -43,31 +43,24 @@ export default function HeroSearch() {
           aria-label="Search the knowledge base"
           className="relative"
         >
-          <input
-            type="search"
-            placeholder="Search for symptoms, medications, conditions…"
+          <AutocompleteInput
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className={cn(
+            onChange={setQuery}
+            placeholder="Search for symptoms, medications, conditions…"
+            aria-label="Search query"
+            inputClassName={cn(
               "w-full h-[58px] pl-6 pr-16 rounded-full bg-white text-[var(--color-text-primary)]",
               "text-base placeholder:text-[var(--color-text-tertiary)]",
               "shadow-[var(--shadow-lg)]",
               "focus-visible:outline-none focus-visible:shadow-[var(--shadow-focus)]"
             )}
-            aria-label="Search query"
-          />
-          <button
-            type="submit"
-            aria-label="Submit search"
-            className={cn(
+            buttonClassName={cn(
               "absolute right-2 top-1/2 -translate-y-1/2",
               "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full",
               "bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white",
               "flex items-center justify-center transition-colors duration-150"
             )}
-          >
-            <Search size={18} aria-hidden="true" />
-          </button>
+          />
         </form>
 
         {/* Popular searches */}
