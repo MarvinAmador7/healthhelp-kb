@@ -8,10 +8,12 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get("type") ?? "";
   const page = parseInt(searchParams.get("page") ?? "0", 10);
 
-  const client = algoliasearch(
-    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
-    process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY!
-  );
+  // Accept either naming convention; fall back to admin key (server-side route is safe)
+  const apiKey =
+    process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY ??
+    process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY ??
+    process.env.ALGOLIA_ADMIN_KEY!;
+  const client = algoliasearch(process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!, apiKey);
 
   const filters: string[] = [];
   if (category) filters.push(`category:"${category}"`);
