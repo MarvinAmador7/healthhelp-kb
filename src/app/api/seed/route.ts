@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
       indexName: "articles",
       indexSettings: {
         searchableAttributes: ["title", "excerpt", "content", "tags", "categoryTitle", "authorName"],
-        attributesForFaceting: ["category", "articleType", "filterOnly(clinicallyReviewed)", "tags"],
+        attributesForFaceting: ["categoryTitle", "category", "articleType", "filterOnly(clinicallyReviewed)", "tags"],
         customRanking: ["desc(helpfulCount)", "desc(publishedAt)"],
         highlightPreTag: "<mark>",
         highlightPostTag: "</mark>",

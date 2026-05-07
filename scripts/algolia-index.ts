@@ -23,7 +23,7 @@ const algolia = algoliasearch(
   process.env.ALGOLIA_ADMIN_KEY!
 );
 
-const INDEX_NAME = process.env.ALGOLIA_INDEX_NAME ?? "healthhelp_articles";
+const INDEX_NAME = process.env.ALGOLIA_INDEX_NAME ?? "articles";
 
 const ALL_ARTICLES_QUERY = `*[_type == "article"] {
   _id,
@@ -96,7 +96,7 @@ async function main() {
     helpfulCount: a.helpfulCount ?? 0,
     totalFeedbackCount: a.totalFeedbackCount ?? 0,
     categoryTitle: a.category?.title ?? null,
-    categorySlug: a.category?.slug ?? null,
+    category: a.category?.slug ?? null,
     tags: (a.tags ?? []).map((t) => t.title),
     authorName: a.author?.name ?? null,
   }));
@@ -118,8 +118,9 @@ async function main() {
         "authorName",
       ],
       attributesForFaceting: [
-        "filterOnly(categoryTitle)",
-        "filterOnly(articleType)",
+        "categoryTitle",
+        "category",
+        "articleType",
         "filterOnly(clinicallyReviewed)",
         "tags",
       ],

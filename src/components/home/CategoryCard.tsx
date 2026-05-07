@@ -9,7 +9,7 @@ interface Props {
 export default function CategoryCard({ category }: Props) {
   return (
     <Link
-      href={`/search?category=${category.slug}`}
+      href={`/search?category=${encodeURIComponent(category.title)}`}
       className={cn(
         "group flex flex-col items-center text-center p-6 bg-white rounded-[var(--radius-lg)]",
         "border-[1.5px] border-[var(--color-border)]",

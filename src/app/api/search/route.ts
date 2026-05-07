@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const client = algoliasearch(process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!, apiKey);
 
   const filters: string[] = [];
-  if (category) filters.push(`category:"${category}"`);
+  if (category) filters.push(`categoryTitle:"${category}"`);
   if (type) filters.push(`articleType:"${type}"`);
 
   const result = await client.searchSingleIndex({
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       page,
       hitsPerPage: 10,
       filters: filters.join(" AND "),
-      facets: ["category", "articleType"],
+      facets: ["categoryTitle", "articleType"],
       attributesToHighlight: ["title", "excerpt"],
       highlightPreTag: "<mark>",
       highlightPostTag: "</mark>",

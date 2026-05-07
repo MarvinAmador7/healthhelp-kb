@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { SlidersHorizontal, ThumbsUp, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -58,7 +58,8 @@ export default function SearchPageContent() {
 
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [localQuery, setLocalQuery] = useState(query);
+  // Pre-populate with category title when arriving from a category card (no text query yet)
+  const [localQuery, setLocalQuery] = useState(query || categoryFilter);
 
   const fetchResults = useCallback(async () => {
     setLoading(true);
@@ -77,7 +78,7 @@ export default function SearchPageContent() {
   }, [query, categoryFilter, typeFilter, page]);
 
   useEffect(() => {
-    setLocalQuery(query);
+    setLocalQuery(query || categoryFilter);
     fetchResults();
   }, [query, categoryFilter, typeFilter, page, fetchResults]);
 
@@ -98,16 +99,8 @@ export default function SearchPageContent() {
   const nbHits = results?.nbHits ?? 0;
   const nbPages = results?.nbPages ?? 0;
   const facets = results?.facets ?? {};
-  const categoryFacets = facets["category"] ?? {};
+  const categoryFacets = facets["categoryTitle"] ?? {};
   const typeFacets = facets["articleType"] ?? {};
-
-  const slugToTitle = useMemo(() => {
-    const map: Record<string, string> = {};
-    for (const h of hits) {
-      if (h.category && h.categoryTitle) map[h.category] = h.categoryTitle;
-    }
-    return map;
-  }, [hits]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -178,7 +171,7 @@ export default function SearchPageContent() {
                         categoryFilter === cat ? "text-[var(--color-primary)] font-medium bg-[var(--color-primary-light)]" : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)]"
                       )}
                     >
-                      <span>{slugToTitle[cat] ?? cat}</span>
+                      <span>{cat}</span>
                       <span className="text-[var(--color-text-tertiary)] text-xs">({count})</span>
                     </button>
                   </li>
