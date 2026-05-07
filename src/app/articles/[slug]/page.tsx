@@ -13,7 +13,7 @@ import Footer from "@/components/layout/Footer";
 import TableOfContents, { type TocEntry } from "@/components/article/TableOfContents";
 import ContactSupportCta from "@/components/article/ContactSupportCta";
 import FeedbackWidget from "@/components/article/FeedbackWidget";
-import Callout from "@/components/article/Callout";
+import ArticleBody from "@/components/article/ArticleBody";
 import { formatDate, formatReadTime, helpfulPercent, safeJsonLd } from "@/lib/utils";
 import {
   Clock,
@@ -96,12 +96,28 @@ export default async function ArticlePage({ params }: Props) {
     articleSection: article.category.title,
   };
 
-  // Placeholder TOC entries — in production, extract from portable text body
-  const toc: TocEntry[] = [
-    { id: "overview", text: "Overview", level: 2 },
-    { id: "details", text: "Details", level: 2 },
-    { id: "when-to-seek-help", text: "When to seek help", level: 2 },
-  ];
+  // TOC entries — extracted from H2/H3 headings in the article body.
+  type SanityBlock = {
+    _type: string;
+    style?: string;
+    children?: { text?: string }[];
+  };
+  function slugifyHeading(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
+  const toc: TocEntry[] = ((article.body as SanityBlock[] | undefined) ?? [])
+    .filter((b) => b._type === "block" && (b.style === "h2" || b.style === "h3"))
+    .map((b) => {
+      const text = (b.children ?? []).map((c) => c.text ?? "").join("");
+      return {
+        id: slugifyHeading(text),
+        text,
+        level: b.style === "h3" ? 3 : 2,
+      };
+    });
 
   return (
     <>
@@ -235,44 +251,9 @@ export default async function ArticlePage({ params }: Props) {
                 {article.excerpt}
               </p>
 
-              {/* Body — placeholder; in production render Portable Text */}
-              <div id="overview" className="mt-8 prose prose-base max-w-none">
-                <h2 className="text-xl font-bold text-[var(--color-text-primary)] mt-8 mb-3">
-                  Overview
-                </h2>
-                <p className="text-[var(--color-text-secondary)] leading-[1.78]">
-                  Article body content is rendered here from Sanity Portable Text.
-                  Connect your Sanity project ID to see real content.
-                </p>
-
-                <Callout
-                  type="info"
-                  text="This is an example informational callout. Use these to highlight important notes."
-                />
-
-                <h2 id="details" className="text-xl font-bold text-[var(--color-text-primary)] mt-8 mb-3">
-                  Details
-                </h2>
-                <p className="text-[var(--color-text-secondary)] leading-[1.78]">
-                  Detailed content goes here.
-                </p>
-
-                <Callout
-                  type="warning"
-                  text="This is a warning callout. Use for important cautions that require attention."
-                />
-
-                <h2 id="when-to-seek-help" className="text-xl font-bold text-[var(--color-text-primary)] mt-8 mb-3">
-                  When to seek help
-                </h2>
-                <p className="text-[var(--color-text-secondary)] leading-[1.78]">
-                  Contact your healthcare provider immediately if you experience any of the following symptoms.
-                </p>
-
-                <Callout
-                  type="caution"
-                  text="Medical caution: Seek emergency care immediately for severe symptoms. Do not delay treatment."
-                />
+              {/* Body — Sanity portable text */}
+              <div className="mt-6">
+                <ArticleBody body={(article.body as unknown[] | undefined) ?? []} />
               </div>
 
               {/* Tags */}
