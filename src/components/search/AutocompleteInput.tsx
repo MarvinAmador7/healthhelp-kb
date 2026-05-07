@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useId } from "react";
+import { useRef, useState, useEffect, useId, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { InstantSearch, useSearchBox, useHits, Configure } from "react-instantsearch";
 import { liteClient } from "algoliasearch/lite";
@@ -132,15 +132,17 @@ function AutocompleteInner({
   const [dismissed, setDismissed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const { refine } = useSearchBox({
-    queryHook(query, search) {
-      // Debounce Algolia requests at 280 ms; require ≥ 2 chars.
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => {
-        search(query.length >= 2 ? query : "");
-      }, 280);
-    },
-  });
+  // useCallback with empty deps keeps this function reference stable across renders.
+  // useConnector → useStableValue compares props with dequal (no function override),
+  // so an unstable queryHook reference triggers setStableValue during render → infinite loop.
+  const queryHook = useCallback((query: string, search: (q: string) => void) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      search(query.length >= 2 ? query : "");
+    }, 280);
+  }, []); // debounceRef is a ref — stable by definition
+
+  const { refine } = useSearchBox({ queryHook });
 
   const { hits } = useHits<ArticleHit>();
 
