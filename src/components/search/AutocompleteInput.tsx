@@ -8,8 +8,9 @@ import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BaseHit } from "instantsearch.js";
 
-// Lazy singleton — only called once env vars are confirmed to be non-empty.
-// Guards against module evaluation during SSR when NEXT_PUBLIC_ vars may be absent.
+// Lazy singleton — only initialised when env vars are confirmed non-empty.
+// Prevents module-level evaluation crash during SSR pre-render builds where
+// NEXT_PUBLIC_ vars may be absent.
 let _client: ReturnType<typeof buildClient> | null = null;
 
 function buildClient() {
@@ -22,7 +23,7 @@ function buildClient() {
 
   const raw = liteClient(appId, key);
 
-  // Prevent empty-query searches from hitting Algolia.
+  // Prevent empty-query requests from reaching Algolia.
   // react-instantsearch sends the legacy v4 array format: [{indexName, params}]
   return {
     ...raw,
@@ -70,7 +71,7 @@ interface AutocompleteInputProps {
   "aria-label"?: string;
 }
 
-// Minimal fallback that renders the input + submit button without autocomplete.
+// Plain input rendered when Algolia is not configured.
 function PlainInput({
   value,
   onChange,
@@ -99,8 +100,6 @@ function PlainInput({
 
 export default function AutocompleteInput(props: AutocompleteInputProps) {
   const client = getSearchClient();
-
-  // If Algolia is not configured, degrade to a plain input.
   if (!client) return <PlainInput {...props} />;
 
   return (
@@ -128,11 +127,14 @@ function AutocompleteInner({
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [open, setOpen] = useState(false);
+  // `dismissed` tracks whether the user has explicitly closed the dropdown
+  // (Escape key or outside click). Reset to false on each new keystroke.
+  const [dismissed, setDismissed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const { refine } = useSearchBox({
     queryHook(query, search) {
+      // Debounce Algolia requests at 280 ms; require ≥ 2 chars.
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
         search(query.length >= 2 ? query : "");
@@ -142,22 +144,14 @@ function AutocompleteInner({
 
   const { hits } = useHits<ArticleHit>();
 
-  // Keep Algolia in sync with the controlled input value.
-  useEffect(() => {
-    refine(value);
-  }, [value, refine]);
+  // Computed: avoids storing derived state in effects (no re-render loops).
+  const showDropdown = hits.length > 0 && value.length >= 2 && !dismissed;
 
-  // Show/hide dropdown when hits or query length changes.
-  useEffect(() => {
-    setOpen(hits.length > 0 && value.length >= 2);
-    setActiveIndex(-1);
-  }, [hits, value]);
-
-  // Dismiss on outside click.
+  // Dismiss on outside click — only this one effect is needed.
   useEffect(() => {
     function onDown(e: MouseEvent) {
       if (!containerRef.current?.contains(e.target as Node)) {
-        setOpen(false);
+        setDismissed(true);
         setActiveIndex(-1);
       }
     }
@@ -165,14 +159,22 @@ function AutocompleteInner({
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    onChange(v);       // update parent (controlled input)
+    refine(v);         // trigger Algolia via queryHook (debounced)
+    setDismissed(false);
+    setActiveIndex(-1);
+  }
+
   function navigate(slug: string) {
-    setOpen(false);
+    setDismissed(true);
     setActiveIndex(-1);
     router.push(`/articles/${slug}`);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!open || !hits.length) return;
+    if (!showDropdown || !hits.length) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setActiveIndex((i) => Math.min(i + 1, hits.length - 1));
@@ -183,7 +185,7 @@ function AutocompleteInner({
       e.preventDefault();
       navigate(hits[activeIndex].slug);
     } else if (e.key === "Escape") {
-      setOpen(false);
+      setDismissed(true);
       setActiveIndex(-1);
     }
   }
@@ -198,14 +200,14 @@ function AutocompleteInner({
         role="combobox"
         aria-label={ariaLabel}
         aria-autocomplete="list"
-        aria-expanded={open}
-        aria-controls={open ? listboxId : undefined}
+        aria-expanded={showDropdown}
+        aria-controls={showDropdown ? listboxId : undefined}
         aria-activedescendant={activeOptionId}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         onFocus={() => {
-          if (hits.length > 0 && value.length >= 2) setOpen(true);
+          if (hits.length > 0 && value.length >= 2) setDismissed(false);
         }}
         placeholder={placeholder}
         autoComplete="off"
@@ -216,7 +218,7 @@ function AutocompleteInner({
         <Search size={18} aria-hidden="true" />
       </button>
 
-      {open && hits.length > 0 && (
+      {showDropdown && (
         <ul
           id={listboxId}
           role="listbox"
