@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "Find answers to your health questions with our trusted, clinically reviewed knowledge base.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://help.healthco.com"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://project-sxpkl.vercel.app"
   ),
   openGraph: {
     type: "website",

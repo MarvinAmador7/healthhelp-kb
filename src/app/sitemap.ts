@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { client } from "@/lib/sanity/client";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://help.healthco.com";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://project-sxpkl.vercel.app";
 
 export const revalidate = 3600;
 

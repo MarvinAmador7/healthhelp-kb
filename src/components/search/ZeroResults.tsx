@@ -71,6 +71,20 @@ export default function ZeroResults({ query }: Props) {
           Contact support
         </a>
       </div>
+
+      {process.env.NEXT_PUBLIC_STATUS_URL && (
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-6">
+          Search not loading?{" "}
+          <a
+            href={process.env.NEXT_PUBLIC_STATUS_URL}
+            target="_blank"
+            rel="noopener"
+            className="underline hover:text-[var(--color-primary)]"
+          >
+            Check service status
+          </a>
+        </p>
+      )}
     </div>
   );
 }

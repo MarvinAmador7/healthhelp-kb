@@ -23,7 +23,7 @@ export const events = {
     trackEvent("article_view", { slug, title, category }),
 
   feedbackSubmit: (slug: string, helpful: boolean) =>
-    trackEvent("article_feedback", { slug, helpful }),
+    trackEvent(helpful ? "article_helpful" : "article_not_helpful", { slug }),
 
   contactClick: (source: string) =>
     trackEvent("contact_click", { source }),

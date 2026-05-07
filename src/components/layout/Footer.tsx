@@ -23,6 +23,18 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-white/80">
               <li><a href="mailto:support@healthco.com" className="hover:text-white transition-colors">Email support</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Live chat</a></li>
+              {process.env.NEXT_PUBLIC_STATUS_URL && (
+                <li>
+                  <a
+                    href={process.env.NEXT_PUBLIC_STATUS_URL}
+                    target="_blank"
+                    rel="noopener"
+                    className="hover:text-white transition-colors"
+                  >
+                    Service status
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
         </div>
