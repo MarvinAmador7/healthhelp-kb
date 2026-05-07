@@ -203,7 +203,7 @@ export async function POST(req: NextRequest) {
       readTimeMinutes: a.readTimeMinutes ?? 0,
       publishedAt: a.publishedAt, updatedAt: a.updatedAt,
       helpfulCount: a.helpfulCount ?? 0, totalFeedbackCount: a.totalFeedbackCount ?? 0,
-      categoryTitle: a.categoryTitle, categorySlug: a.categorySlug,
+      category: a.categorySlug, categoryTitle: a.categoryTitle,
       tags: a.tags ?? [], authorName: a.authorName,
     }));
     await algolia.saveObjects({ indexName: "articles", objects });
@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
       indexName: "articles",
       indexSettings: {
         searchableAttributes: ["title", "excerpt", "content", "tags", "categoryTitle", "authorName"],
-        attributesForFaceting: ["filterOnly(categoryTitle)", "filterOnly(articleType)", "filterOnly(clinicallyReviewed)", "tags"],
+        attributesForFaceting: ["category", "articleType", "filterOnly(clinicallyReviewed)", "tags"],
         customRanking: ["desc(helpfulCount)", "desc(publishedAt)"],
         highlightPreTag: "<mark>",
         highlightPostTag: "</mark>",

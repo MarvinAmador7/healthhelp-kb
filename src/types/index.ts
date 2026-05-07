@@ -44,7 +44,7 @@ export interface SearchHit {
   slug: string;
   excerpt: string;
   category: string;
-  categorySlug: string;
+  categoryTitle: string;
   articleType: string;
   readTimeMinutes: number;
   updatedAt: string;

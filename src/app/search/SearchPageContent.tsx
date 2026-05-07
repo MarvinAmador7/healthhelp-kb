@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { SlidersHorizontal, ThumbsUp, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,7 @@ interface Hit {
   slug: string;
   excerpt: string;
   category: string;
-  categorySlug: string;
+  categoryTitle: string;
   articleType: string;
   readTimeMinutes: number;
   updatedAt: string;
@@ -101,6 +101,14 @@ export default function SearchPageContent() {
   const categoryFacets = facets["category"] ?? {};
   const typeFacets = facets["articleType"] ?? {};
 
+  const slugToTitle = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const h of hits) {
+      if (h.category && h.categoryTitle) map[h.category] = h.categoryTitle;
+    }
+    return map;
+  }, [hits]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Search bar */}
@@ -170,7 +178,7 @@ export default function SearchPageContent() {
                         categoryFilter === cat ? "text-[var(--color-primary)] font-medium bg-[var(--color-primary-light)]" : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)]"
                       )}
                     >
-                      <span>{cat}</span>
+                      <span>{slugToTitle[cat] ?? cat}</span>
                       <span className="text-[var(--color-text-tertiary)] text-xs">({count})</span>
                     </button>
                   </li>
@@ -270,7 +278,7 @@ export default function SearchPageContent() {
                     className="block bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] p-5 hover:border-[var(--color-primary-medium)] hover:shadow-[var(--shadow-sm)] transition-all duration-150 group"
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-[var(--color-primary)] mb-2">
-                      {hit.category}
+                      {hit.categoryTitle}
                     </p>
                     <h2
                       className="text-base font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-primary)] mb-2 leading-snug transition-colors duration-150"
