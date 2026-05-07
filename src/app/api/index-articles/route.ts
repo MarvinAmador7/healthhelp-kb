@@ -10,7 +10,9 @@ export async function POST(req: NextRequest) {
   const secret = process.env.SANITY_WEBHOOK_SECRET ?? "";
   const expected = crypto.createHmac("sha256", secret).update(body).digest("hex");
 
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+  const sigBuf = Buffer.from(signature);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.byteLength !== expBuf.byteLength || !crypto.timingSafeEqual(sigBuf, expBuf)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
